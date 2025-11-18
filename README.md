@@ -46,7 +46,7 @@ A personal website showcasing my projects, skills, and achievements.
 
 ## 📬 Contact Me
 - **Email**: ryanbeattie209@gmail.com
-- **LinkedIn**: [linkedin.com/in/ryanbeattie309](https://linkedin.com/in/ryanbeattie209)
+- **LinkedIn**: [linkedin.com/in/ryanbeattie209](https://linkedin.com/in/ryanbeattie209)
 - **Portfolio**: [yourportfolio.com](https://yourportfolio.com)
 
 ---
