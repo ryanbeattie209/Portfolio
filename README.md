@@ -3,7 +3,7 @@
 ## 🚀 About Me
 Computer Science graduate passionate about **Extended Reality (XR)**, **Accessibility**, and **Human-Computer Interaction**. I focus on creating inclusive technologies and immersive experiences.
 
-- 🎓 BSc in Computer Science
+- 🎓 MComp in Computer Science
 - 💡 Interested in XR, VR/AR, Accessibility, and AI
 - 🌱 Currently exploring advanced XR frameworks and accessibility design
 
@@ -45,8 +45,8 @@ A personal website showcasing my projects, skills, and achievements.
 ---
 
 ## 📬 Contact Me
-- **Email**: your.email@example.com
-- **LinkedIn**: [linkedin.com/in/ryanbeattie](https://linkedin.com/in/ryanbeattie)
+- **Email**: ryanbeattie209@gmail.com
+- **LinkedIn**: [linkedin.com/in/ryanbeattie309](https://linkedin.com/in/ryanbeattie209)
 - **Portfolio**: [yourportfolio.com](https://yourportfolio.com)
 
 ---
