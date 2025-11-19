@@ -15,5 +15,3 @@ This Project is currently running and will have additons placed in as the devleo
 - Radoslaw Fabian
 - Aidan Parkhouse
 - Jakub Stachowiak
-- 
-
