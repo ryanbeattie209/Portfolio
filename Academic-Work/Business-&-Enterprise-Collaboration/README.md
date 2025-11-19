@@ -18,21 +18,6 @@ A language learning application similar to Duolingo, focused on English ↔ Wels
 - **Database**: MySQL
 - **Frameworks**: Spring MVC, JPA
 
-## 📥 Installation Instructions
-1. Clone the repository:
-   ```bash
-   git clone <repo-url>
-   ```
-2. Navigate to the project directory:
-   ```bash
-   cd welsh-language-learning-app
-   ```
-3. Configure database settings in `application.properties`.
-4. Build and run the application:
-   ```bash
-   mvn spring-boot:run
-   ```
-
 ## 🚀 Usage Guide
 - **Student**: Take tests, submit answers, view results.
 - **Instructor**: View all results, manage nouns.
