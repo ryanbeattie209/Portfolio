@@ -1,5 +1,5 @@
-# Project Name
-Masters-Team-Project
+# Masters Team Project
+Masters Dissertation Project between collaboratiors from MComp and MEng master degree students.
 
 ---
 
