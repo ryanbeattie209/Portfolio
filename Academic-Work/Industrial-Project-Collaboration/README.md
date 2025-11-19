@@ -14,21 +14,6 @@ The Rapid Registration Tool is designed to accurately track student attendance a
 - **Frontend**: HTML5, CSS
 - **Database**: SQL-based
 
-## 📥 Installation Instructions
-1. Clone the repository:
-   ```bash
-   git clone <repo-url>
-   ```
-2. Navigate to the project directory:
-   ```bash
-   cd rapid-registration-tool
-   ```
-3. Configure database settings in `application.properties`.
-4. Build and run the application:
-   ```bash
-   mvn spring-boot:run
-   ```
-
 ## 🚀 Usage Guide
 - **Lecturer**: Log in, create session codes, manage attendance.
 - **Student**: Log in, enter classroom code, provide library card digits.
