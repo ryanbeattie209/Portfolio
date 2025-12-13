@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quest Board - Gamified Task Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1E1B4B 0%, #581C87 50%, #1E1B4B 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #FFC107;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: pulse 3s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stats-card {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .stats-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .level-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .crown-icon {
+            font-size: 32px;
+        }
+
+        .level-text h2 {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .hero-rank {
+            font-size: 12px;
+            color: #FFC107;
+            font-weight: bold;
+        }
+
+        .stats-right {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #AAA;
+            margin-top: 2px;
+        }
+
+        .xp-bar {
+            width: 100%;
+            height: 12px;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3B82F6, #A855F7);
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .xp-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.2);
+            animation: shine 2s infinite;
+        }
+
+        @keyframes shine {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .xp-text {
+            text-align: center;
+            font-size: 12px;
+            color: #CCC;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: #A855F7;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.5);
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .filter-chips::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .filter-chips::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        .chip {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .chip.active {
+            background: linear-gradient(90deg, #A855F7, #3B82F6);
+            box-shadow: 0 2px 10px rgba(168, 85, 247, 0.5);
+        }
+
+        .chip.common.active { background: #6B7280; }
+        .chip.rare.active { background: #3B82F6; }
+        .chip.epic.active { background: #A855F7; }
+        .chip.legendary.active { background: #FFC107; }
+
+        .add-task-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .task-input {
+            flex: 1;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .task-input::placeholder {
+            color: #888;
+        }
+
+        .add-btn {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #A855F7, #3B82F6);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .add-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.5);
+        }
+
+        .selector-label {
+            font-size: 12px;
+            color: #AAA;
+            margin-bottom: 5px;
+        }
+
+        .selector-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .selector-btn {
+            padding: 10px 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .selector-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .selector-btn.common.active { background: #6B7280; }
+        .selector-btn.rare.active { background: #3B82F6; }
+        .selector-btn.epic.active { background: #A855F7; }
+        .selector-btn.legendary.active { background: #FFC107; }
+
+        .time-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .time-btn {
+            padding: 10px 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .time-btn.active {
+            background: #3B82F6;
+            transform: scale(1.05);
+        }
+
+        .time-label {
+            font-size: 9px;
+            margin-top: 2px;
+        }
+
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 16px;
+            border-left: 4px solid;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            transition: all 0.3s;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .task-card.common { border-left-color: #6B7280; }
+        .task-card.rare { border-left-color: #3B82F6; }
+        .task-card.epic { border-left-color: #A855F7; }
+        .task-card.legendary { border-left-color: #FFC107; }
+
+        .task-card.completed {
+            background: rgba(34, 197, 94, 0.2);
+            border-left-color: #22C55E;
+        }
+
+        .complete-btn {
+            width: 32px;
+            height: 32px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            background: transparent;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .complete-btn:hover {
+            background: #22C55E;
+            border-color: #22C55E;
+        }
+
+        .complete-btn.completed {
+            background: #22C55E;
+            border-color: #22C55E;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-text {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .task-text.completed {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .difficulty-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 10px;
+        }
+
+        .difficulty-badge.common { background: #6B7280; }
+        .difficulty-badge.rare { background: #3B82F6; }
+        .difficulty-badge.epic { background: #A855F7; }
+        .difficulty-badge.legendary { background: #FFC107; color: #000; }
+
+        .task-rewards {
+            color: #FFC107;
+        }
+
+        .delete-btn {
+            width: 32px;
+            height: 32px;
+            background: transparent;
+            border: none;
+            color: #EF4444;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .delete-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #AAA;
+        }
+
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        .streak-bonus {
+            background: rgba(255, 152, 0, 0.3);
+            border: 2px solid #FF9800;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            margin-top: 15px;
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 152, 0, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(255, 152, 0, 0.6); }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #FFC107;
+            animation: confetti-fall 2s linear forwards;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <!-- Stats Card -->
+        <div class="stats-card">
+            <div class="stats-header">
+                <div class="level-info">
+                    <div class="crown-icon">👑</div>
+                    <div class="level-text">
+                        <h2 id="level">Level 1</h2>
+                        <div class="hero-rank" id="heroRank">Squire</div>
+                    </div>
+                </div>
+                <div class="stats-right">
+                    <div class="stat-item">
+                        <div class="stat-value">
+                            <span>🏆</span>
+                            <span id="coins">0</span>
+                        </div>
+                        <div class="stat-label">Coins</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">
+                            <span>🔥</span>
+                            <span id="streak">0</span>
+                        </div>
+                        <div class="stat-label">Streak</div>
+                    </div>
+                </div>
+            </div>
+            <div class="xp-bar">
+                <div class="xp-fill" id="xpFill" style="width: 0%"></div>
+            </div>
+            <div class="xp-text" id="xpText">0 / 100 XP</div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('active')">⚔️ Active Quests</button>
+            <button class="tab" onclick="switchTab('completed')">🏆 Completed</button>
+        </div>
+
+        <!-- Filter Chips -->
+        <div class="filter-chips">
+            <button class="chip active" onclick="setFilter('all')">All Quests</button>
+            <button class="chip common" onclick="setFilter('common')">Common</button>
+            <button class="chip rare" onclick="setFilter('rare')">Rare</button>
+            <button class="chip epic" onclick="setFilter('epic')">Epic</button>
+            <button class="chip legendary" onclick="setFilter('legendary')">Legendary</button>
+        </div>
+
+        <!-- Add Task Card -->
+        <div class="add-task-card">
+            <div class="input-row">
+                <input type="text" class="task-input" id="taskInput" placeholder="Enter your quest..." onkeypress="handleEnter(event)">
+                <button class="add-btn" onclick="addTask()">+</button>
+            </div>
+            
+            <div class="selector-label">Quest Rank:</div>
+            <div class="selector-row">
+                <button class="selector-btn common active" onclick="setDifficulty('common')">Common<br><small>+10 XP</small></button>
+                <button class="selector-btn rare" onclick="setDifficulty('rare')">Rare<br><small>+25 XP</small></button>
+                <button class="selector-btn epic" onclick="setDifficulty('epic')">Epic<br><small>+50 XP</small></button>
+                <button class="selector-btn legendary" onclick="setDifficulty('legendary')">Legendary<br><small>+100 XP</small></button>
+            </div>
+            
+            <div class="selector-label">Time Period:</div>
+            <div class="time-selector">
+                <button class="time-btn active" onclick="setTimePeriod('today')">☀️<div class="time-label">Today</div></button>
+                <button class="time-btn" onclick="setTimePeriod('week')">📅<div class="time-label">This Week</div></button>
+                <button class="time-btn" onclick="setTimePeriod('month')">🗓️<div class="time-label">This Month</div></button>
+                <button class="time-btn" onclick="setTimePeriod('someday')">⏳<div class="time-label">Someday</div></button>
+            </div>
+        </div>
+
+        <!-- Streak Bonus Alert -->
+        <div id="streakBonus" class="streak-bonus" style="display: none;">
+            <strong>🔥 One more quest for a +25 coin streak bonus!</strong>
+        </div>
+
+        <!-- Tasks List -->
+        <div class="tasks-list" id="tasksList"></div>
+    </div>
+
+    <script>
+        // Hero Ranks
+        const heroRanks = {
+            1: 'Squire', 5: 'Apprentice', 10: 'Warrior', 20: 'Knight',
+            35: 'Elite Knight', 50: 'Champion', 75: 'Master', 100: 'Grand Master',
+            150: 'Legend', 200: 'Epic Hero', 300: 'Mythic Champion', 400: 'Dragon Slayer',
+            500: 'Titan', 650: 'Demi-God', 800: 'God of War', 1000: 'Hero of the Universe'
+        };
+
+        const difficulties = {
+            common: { xp: 10, coins: 5 },
+            rare: { xp: 25, coins: 15 },
+            epic: { xp: 50, coins: 30 },
+            legendary: { xp: 100, coins: 60 }
+        };
+
+        const timePeriods = {
+            today: '☀️ Today',
+            week: '📅 This Week',
+            month: '🗓️ This Month',
+            someday: '⏳ Someday'
+        };
+
+        let state = {
+            tasks: JSON.parse(localStorage.getItem('tasks') || '[]'),
+            xp: parseInt(localStorage.getItem('xp') || '0'),
+            level: parseInt(localStorage.getItem('level') || '1'),
+            coins: parseInt(localStorage.getItem('coins') || '0'),
+            streak: parseInt(localStorage.getItem('streak') || '0'),
+            currentTab: 'active',
+            currentFilter: 'all',
+            selectedDifficulty: 'common',
+            selectedTimePeriod: 'today'
+        };
+
+        // Initialize
+        createStars();
+        updateStats();
+        renderTasks();
+
+        function createStars() {
+            const stars = document.getElementById('stars');
+            for (let i = 0; i < 20; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                stars.appendChild(star);
+            }
+        }
+
+        function getHeroRank(level) {
+            const ranks = Object.keys(heroRanks).map(Number).sort((a, b) => b - a);
+            for (let rank of ranks) {
+                if (level >= rank) return heroRanks[rank];
+            }
+            return 'Squire';
+        }
+
+        function updateStats() {
+            document.getElementById('level').textContent = 'Level ' + state.level;
+            document.getElementById('heroRank').textContent = getHeroRank(state.level);
+            document.getElementById('coins').textContent = state.coins;
+            document.getElementById('streak').textContent = state.streak;
+            
+            const xpToNext = state.level * 100;
+            const currentXp = state.xp % 100;
+            const progress = (currentXp / xpToNext) * 100;
+            
+            document.getElementById('xpFill').style.width = progress + '%';
+            document.getElementById('xpText').textContent = currentXp + ' / ' + xpToNext + ' XP';
+            
+            // Streak bonus alert
+            const streakBonus = document.getElementById('streakBonus');
+            if (state.streak > 0 && state.streak % 5 === 4) {
+                streakBonus.style.display = 'block';
+            } else {
+                streakBonus.style.display = 'none';
+            }
+            
+            saveState();
+        }
+
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const text = input.value.trim();
+            
+            if (!text) return;
+            
+            const task = {
+                id: Date.now(),
+                text: text,
+                difficulty: state.selectedDifficulty,
+                timePeriod: state.selectedTimePeriod,
+                completed: false,
+                timestamp: Date.now()
+            };
+            
+            state.tasks.push(task);
+            input.value = '';
+            saveState();
+            renderTasks();
+        }
+
+        function handleEnter(event) {
+            if (event.key === 'Enter') addTask();
+        }
+
+        function completeTask(id) {
+            const task = state.tasks.find(t => t.id === id);
+            if (!task || task.completed) return;
+            
+            task.completed = true;
+            
+            const reward = difficulties[task.difficulty];
+            state.xp += reward.xp;
+            state.coins += reward.coins;
+            state.streak += 1;
+            
+            // Check for level up
+            const xpToNext = state.level * 100;
+            if (state.xp >= xpToNext) {
+                state.level += 1;
+                triggerConfetti();
+            }
+            
+            // Streak bonus
+            if (state.streak % 5 === 0) {
+                state.coins += 25;
+                alert('🔥 Streak Bonus! +25 coins!');
+            }
+            
+            updateStats();
+            renderTasks();
+        }
+
+        function deleteTask(id) {
+            state.tasks = state.tasks.filter(t => t.id !== id);
+            saveState();
+            renderTasks();
+        }
+
+        function switchTab(tab) {
+            state.currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            renderTasks();
+        }
+
+        function setFilter(filter) {
+            state.currentFilter = filter;
+            document.querySelectorAll('.filter-chips .chip').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            renderTasks();
+        }
+
+        function setDifficulty(diff) {
+            state.selectedDifficulty = diff;
+            document.querySelectorAll('.selector-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function setTimePeriod(period) {
+            state.selectedTimePeriod = period;
+            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('tasksList');
+            let tasks = state.tasks.filter(t => 
+                state.currentTab === 'active' ? !t.completed : t.completed
+            );
+            
+            if (state.currentFilter !== 'all') {
+                tasks = tasks.filter(t => t.difficulty === state.currentFilter);
+            }
+            
+            if (tasks.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">${state.currentTab === 'active' ? '⚔️' : '🏆'}</div>
+                        <p>No ${state.currentFilter !== 'all' ? state.currentFilter : ''} quests found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = tasks.map(task => {
+                const reward = difficulties[task.difficulty];
+                return `
+                    <div class="task-card ${task.difficulty} ${task.completed ? 'completed' : ''}">
+                        <button class="complete-btn ${task.completed ? 'completed' : ''}" 
+                                onclick="completeTask(${task.id})" 
+                                ${task.completed ? 'disabled' : ''}>
+                            ${task.completed ? '✓' : ''}
+                        </button>
+                        <div class="task-content">
+                            <div class="task-text ${task.completed ? 'completed' : ''}">${task.text}</div>
+                            <div class="task-meta">
+                                <span class="difficulty-badge ${task.difficulty}">${task.difficulty.toUpperCase()}</span>
+                                <span>${timePeriods[task.timePeriod]}</span>
+                                <span class="task-rewards">⚡ +${reward.xp} XP • 🏆 +${reward.coins}</span>
+                            </div>
+                        </div>
+                        <button class="delete-btn" onclick="deleteTask(${task.id})">🗑️</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function triggerConfetti() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = ['#FFC107', '#A855F7', '#3B82F6', '#EF4444'][Math.floor(Math.random() * 4)];
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 2000);
+                }, i * 30);
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('tasks', JSON.stringify(state.tasks));
+            localStorage.setItem('xp', state.xp);
+            localStorage.setItem('level', state.level);
+            localStorage.setItem('coins', state.coins);
+            localStorage.setItem('streak', state.streak);
+        }
+    </script>
+</body>
+</html>
