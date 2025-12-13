@@ -49,6 +49,10 @@ An interactive 3D globe application built with React and Three.js that lets you 
    http://localhost:3000
    ```
 
+## Image of Globe
+<img width="513" height="461" alt="image" src="https://github.com/user-attachments/assets/cdeee2b7-8b28-42f8-b2a6-f3347eeb67fb" />
+
+
 ## 📖 Usage
 
 ### Adding Photos
